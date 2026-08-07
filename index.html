@@ -1,22 +1,677 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Micron Laboratory Test Search</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Micron Laboratory - Search Test & Rate</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font:14px Arial;background:#f5f8f7;color:#263238}.wrap{max-width:1250px;margin:35px auto;padding:0 15px}.head{background:#009b57;color:#fff;padding:22px;border-radius:12px 12px 0 0}.head h1{margin:0}.search{background:#fff;padding:15px;display:flex;gap:10px}.search input{flex:1;padding:12px;border:1px solid #ccd7d2;border-radius:6px}.search button,.action{background:#009b57;color:#fff;border:0;border-radius:6px;padding:11px 20px;font-weight:bold}table{width:100%;border-collapse:collapse;background:#fff;min-width:1000px}th{background:#009b57;color:white;padding:11px;text-align:left;font-size:12px}td{padding:11px;border-bottom:1px solid #e4ebe8}tr:nth-child(even)td{background:#effaf5}.table{overflow:auto}.eye{border:0;background:#e5f6ef;color:#00884d;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:17px}.modal{display:none;position:fixed;inset:0;background:#0009;padding:20px;z-index:9;align-items:center;justify-content:center}.modal.show{display:flex}.box{background:#fff;width:min(900px,100%);max-height:92vh;border-radius:12px;overflow:hidden}.mh{background:#009b57;color:#fff;padding:16px 20px;display:flex;justify-content:space-between}.mh h2{margin:0;font-size:20px}.close{background:none;border:0;color:#fff;font-size:28px}.scroll{overflow:auto;max-height:calc(92vh - 65px);padding:16px}.sec{border:1px solid #dce8e3;border-radius:7px;margin-bottom:14px;overflow:hidden}.st{background:#e9f8f1;color:#006f42;font-weight:bold;padding:10px 13px}.grid{display:grid;grid-template-columns:210px 1fr}.grid div{padding:9px 12px;border-top:1px solid #edf1ef;font-size:13px}.lab{font-weight:bold;background:#fafcfb}.note{padding:13px;line-height:1.55}@media(max-width:600px){.search{flex-direction:column}.grid{grid-template-columns:1fr}.lab{background:#fafcfb}.modal{padding:8px}}
-</style></head><body>
-<div class="wrap"><div class="head"><h1>Micron Laboratory</h1><div>Search Diagnostic Tests</div></div>
-<div class="search"><input id="q" placeholder="Search Test Code or Test Name"><button onclick="go()">Search</button></div>
-<div class="table"><table><thead><tr><th>👁</th><th>S.No</th><th>Test Code</th><th>Test Name</th><th>Sample Type</th><th>Quantity</th><th>Method</th><th>Schedule & TAT</th><th>Price</th><th>Category</th><th>Department</th></tr></thead><tbody id="tb"></tbody></table></div></div>
-<div id="modal" class="modal" onclick="outside(event)"><div class="box"><div class="mh"><h2 id="title"></h2><button class="close" onclick="closeM()">×</button></div><div class="scroll">
-<div class="sec"><div class="st">Key Information</div><div class="grid" id="key"></div></div>
-<div class="sec"><div class="st">Test Information</div><div class="grid"><div class="lab">Gender</div><div>Both</div><div class="lab">Test Parameters (Name)</div><div>Hb, RBC Count, PCV, MCV, MCH, MCHC, RDW, WBC Count, Absolute Neutrophil Count, Absolute Lymphocyte Count, Absolute Monocyte Count, Absolute Eosinophil Count, Absolute Basophil Count, Platelet Count, MPV, PCT, PDW</div><div class="lab">Test Parameters (Count)</div><div>24</div><div class="lab">Report Display Name</div><div>CBC Haemogram</div></div></div>
-<div class="sec"><div class="st">Sample Information</div><div class="grid"><div class="lab">Sample Container</div><div>EDTA Vacutainer</div><div class="lab">Sample Type</div><div>EDTA Blood</div><div class="lab">Sample Volume</div><div>1 ml</div><div class="lab">Shipping Temperature</div><div>Ambient 25°C / Refrigerated 2–8°C / Frozen 20°C</div><div class="lab">Sample Stability</div><div>Ambient: 6 Days | Refrigerated: 1 Day</div></div></div>
-<div class="sec"><div class="st">Collection & Rejection Information</div><div class="note"><b>Rejected, if any:</b> Quantity not sufficient (QNS), haemolysed, lipemic, icteric, clotted, wrong sample container, incorrect patient labelling, or inappropriate temperature condition.</div><div class="grid"><div class="lab">Sample Retention</div><div>3 Days</div><div class="lab">Collection Instruction</div><div>3 ml EDTA whole blood</div><div class="lab">Ship At</div><div>Ambient</div><div class="lab">TAT</div><div>7 Days</div><div class="lab">Schedule</div><div>Monday – Saturday</div></div></div>
-<div class="sec"><div class="st">Clinical & Patient Information</div><div class="note"><b>Clinical Significance:</b> Complete blood count testing provides information about red blood cells, white blood cells, haemoglobin and platelets and supports routine clinical evaluation.</div><div class="note"><b>Patient Preparation:</b> No special preparation required unless instructed by the laboratory.</div><div class="note"><button class="action">📄 Download PDF</button> <button class="action">📞 Book Test</button></div></div>
-</div></div></div>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f8f6;
+    color:#263238;
+}
+
+.container{
+    max-width:1250px;
+    margin:35px auto;
+    padding:0 15px;
+}
+
+.header{
+    background:#009b57;
+    color:#fff;
+    padding:24px;
+    border-radius:12px 12px 0 0;
+}
+
+.header h1{
+    margin:0;
+    font-size:26px;
+}
+
+.header p{
+    margin:7px 0 0;
+}
+
+.search-box{
+    background:#fff;
+    padding:18px;
+    display:flex;
+    gap:10px;
+    border:1px solid #ddd;
+}
+
+.search-box input{
+    flex:1;
+    padding:13px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:15px;
+}
+
+.search-box button{
+    background:#009b57;
+    color:#fff;
+    border:0;
+    border-radius:6px;
+    padding:0 25px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.table-container{
+    overflow-x:auto;
+    background:#fff;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:1000px;
+}
+
+th{
+    background:#009b57;
+    color:white;
+    padding:12px;
+    text-align:left;
+    font-size:13px;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #e3e9e6;
+    font-size:13px;
+}
+
+tr:nth-child(even) td{
+    background:#effaf5;
+}
+
+.eye-button{
+    border:0;
+    background:#e3f6ed;
+    color:#00894d;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:17px;
+}
+
+.no-result{
+    text-align:center;
+    padding:30px;
+    color:#777;
+}
+
+/* POPUP */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.65);
+    z-index:9999;
+    padding:20px;
+    align-items:center;
+    justify-content:center;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    background:white;
+    width:min(900px,100%);
+    max-height:92vh;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.modal-header{
+    background:#009b57;
+    color:white;
+    padding:17px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.modal-header h2{
+    margin:0;
+    font-size:20px;
+}
+
+.close{
+    border:0;
+    background:none;
+    color:white;
+    font-size:28px;
+    cursor:pointer;
+}
+
+.modal-content{
+    padding:17px;
+    overflow-y:auto;
+    max-height:calc(92vh - 65px);
+}
+
+.section{
+    border:1px solid #dce8e3;
+    border-radius:7px;
+    margin-bottom:15px;
+    overflow:hidden;
+}
+
+.section-title{
+    background:#e8f8f0;
+    color:#006d40;
+    font-weight:bold;
+    padding:11px 14px;
+}
+
+.details-grid{
+    display:grid;
+    grid-template-columns:210px 1fr;
+}
+
+.details-grid div{
+    padding:10px 13px;
+    border-top:1px solid #edf1ef;
+    font-size:13px;
+}
+
+.label{
+    font-weight:bold;
+    background:#fafcfb;
+}
+
+.note{
+    padding:14px;
+    line-height:1.6;
+    font-size:13px;
+}
+
+.action-button{
+    background:#009b57;
+    color:white;
+    border:0;
+    border-radius:6px;
+    padding:10px 16px;
+    font-weight:bold;
+    margin-right:8px;
+}
+
+@media(max-width:600px){
+
+    .search-box{
+        flex-direction:column;
+    }
+
+    .search-box button{
+        height:44px;
+    }
+
+    .details-grid{
+        grid-template-columns:1fr;
+    }
+
+    .label{
+        background:#fafcfb;
+    }
+
+    .modal{
+        padding:8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h1>Micron Laboratory</h1>
+    <p>Search Test & Rate</p>
+</div>
+
+<div class="search-box">
+    <input
+        type="search"
+        id="searchInput"
+        placeholder="Search by Test Code or Test Name..."
+    >
+
+    <button onclick="searchTests()">Search</button>
+</div>
+
+<div class="table-container">
+
+<table>
+
+<thead>
+<tr>
+<th>👁</th>
+<th>S.No</th>
+<th>Test Code</th>
+<th>Test Name</th>
+<th>Sample</th>
+<th>Quantity</th>
+<th>Method</th>
+<th>TAT</th>
+<th>Price</th>
+<th>Category</th>
+<th>Department</th>
+</tr>
+</thead>
+
+<tbody id="testTable">
+<tr>
+<td colspan="11" class="no-result">
+Loading tests...
+</td>
+</tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- POPUP -->
+
+<div class="modal" id="testModal">
+
+<div class="modal-box">
+
+<div class="modal-header">
+
+<h2 id="modalTitle">
+Test Details
+</h2>
+
+<button class="close" onclick="closeModal()">×</button>
+
+</div>
+
+
+<div class="modal-content">
+
+
+<div class="section">
+
+<div class="section-title">
+Key Information
+</div>
+
+<div class="details-grid">
+
+<div class="label">Test Code</div>
+<div id="dCode"></div>
+
+<div class="label">Test Name</div>
+<div id="dName"></div>
+
+<div class="label">Sample</div>
+<div id="dSample"></div>
+
+<div class="label">Quantity</div>
+<div id="dQuantity"></div>
+
+<div class="label">Method</div>
+<div id="dMethod"></div>
+
+<div class="label">TAT</div>
+<div id="dTat"></div>
+
+<div class="label">Schedule</div>
+<div id="dSchedule"></div>
+
+<div class="label">Price</div>
+<div id="dPrice"></div>
+
+<div class="label">Fasting</div>
+<div id="dFasting"></div>
+
+<div class="label">Department</div>
+<div id="dDepartment"></div>
+
+<div class="label">Category</div>
+<div id="dCategory"></div>
+
+<div class="label">Container</div>
+<div id="dContainer"></div>
+
+</div>
+
+</div>
+
+
+<div class="section">
+
+<div class="section-title">
+Clinical Significance
+</div>
+
+<div class="note" id="dClinical"></div>
+
+</div>
+
+
+<div class="section">
+
+<div class="section-title">
+Patient Preparation
+</div>
+
+<div class="note" id="dPreparation"></div>
+
+</div>
+
+
+<div class="section">
+
+<div class="section-title">
+Test Parameters
+</div>
+
+<div class="note" id="dParameters"></div>
+
+</div>
+
+
+<div class="section">
+
+<div class="section-title">
+Additional Information
+</div>
+
+<div class="note">
+
+This section can contain further test information,
+sample rejection criteria, sample stability,
+reference information, special instructions,
+PDF download and booking options.
+
+<br><br>
+
+<button class="action-button">
+📄 Download PDF
+</button>
+
+<button class="action-button">
+📞 Book Test
+</button>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+
 <script>
-const t={code:"C0044",name:"CBC Haemogram, EDTA Blood",sample:"EDTA Blood",qty:"1 ml",method:"Automated Cell Counter and Microscopy",schedule:"Monday–Saturday",tat:"7 Days",price:"₹ 300",category:"A",dept:"HEMATOLOGY",container:"EDTA Vacutainer",fasting:"No"};
-const tb=document.getElementById("tb");
-function render(show=true){if(!show){tb.innerHTML="";return}tb.innerHTML=`<tr><td><button class="eye" onclick="openM()">👁</button></td><td>1</td><td>${t.code}</td><td>${t.name}</td><td>${t.sample}</td><td>${t.qty}</td><td>${t.method}</td><td>${t.schedule} / ${t.tat}</td><td>${t.price}</td><td>${t.category}</td><td>${t.dept}</td></tr>`}
-function go(){let q=document.getElementById("q").value.toLowerCase().trim();render(!q||t.code.toLowerCase().includes(q)||t.name.toLowerCase().includes(q))}
-function openM(){document.getElementById("title").textContent=t.name;document.getElementById("key").innerHTML=`<div class="lab">Test Code</div><div>${t.code}</div><div class="lab">Test Name</div><div>${t.name}</div><div class="lab">Method</div><div>${t.method}</div><div class="lab">Price</div><div>${t.price}</div><div class="lab">Category</div><div>${t.category}</div><div class="lab">Department</div><div>${t.dept}</div><div class="lab">Sample Type</div><div>${t.sample}</div><div class="lab">Sample Quantity</div><div>${t.qty}</div><div class="lab">Sample Container</div><div>${t.container}</div><div class="lab">Fasting Req</div><div>${t.fasting}</div>`;document.getElementById("modal").classList.add("show");document.body.style.overflow="hidden"}
-function closeM(){document.getElementById("modal").classList.remove("show");document.body.style.overflow=""}function outside(e){if(e.target.id==="modal")closeM()}render();
-</script></body></html>
+
+let tests = [];
+
+
+/* LOAD DATA FROM tests.json */
+
+fetch("tests.json")
+
+.then(response => {
+
+    if(!response.ok){
+        throw new Error("tests.json not found");
+    }
+
+    return response.json();
+
+})
+
+.then(data => {
+
+    tests = data;
+
+    displayTests(tests);
+
+})
+
+.catch(error => {
+
+    document.getElementById("testTable").innerHTML =
+
+    `<tr>
+        <td colspan="11" class="no-result">
+        Test data load nahi ho raha. Please check tests.json.
+        </td>
+    </tr>`;
+
+    console.log(error);
+
+});
+
+
+/* DISPLAY TESTS */
+
+function displayTests(list){
+
+    const table = document.getElementById("testTable");
+
+    table.innerHTML = "";
+
+    if(list.length === 0){
+
+        table.innerHTML =
+        `<tr>
+            <td colspan="11" class="no-result">
+            No Test Found
+            </td>
+        </tr>`;
+
+        return;
+    }
+
+
+    list.forEach((test,index)=>{
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+
+        <td>
+            <button
+            class="eye-button"
+            onclick="openDetails(${index})">
+            👁
+            </button>
+        </td>
+
+        <td>${index + 1}</td>
+
+        <td>${test.code}</td>
+
+        <td>${test.name}</td>
+
+        <td>${test.sample}</td>
+
+        <td>${test.quantity}</td>
+
+        <td>${test.method}</td>
+
+        <td>${test.tat}</td>
+
+        <td>${test.price}</td>
+
+        <td>${test.category}</td>
+
+        <td>${test.department}</td>
+
+        `;
+
+        table.appendChild(row);
+
+    });
+
+}
+
+
+/* SEARCH */
+
+function searchTests(){
+
+    const query =
+    document
+    .getElementById("searchInput")
+    .value
+    .toLowerCase()
+    .trim();
+
+
+    if(query === ""){
+
+        displayTests(tests);
+
+        return;
+
+    }
+
+
+    const filtered =
+    tests.filter(test =>
+
+        test.name.toLowerCase().includes(query) ||
+
+        test.code.toLowerCase().includes(query)
+
+    );
+
+
+    displayTests(filtered);
+
+}
+
+
+/* LIVE SEARCH */
+
+document
+.getElementById("searchInput")
+.addEventListener("input", searchTests);
+
+
+/* OPEN POPUP */
+
+function openDetails(index){
+
+    const test = tests[index];
+
+    if(!test) return;
+
+
+    document.getElementById("modalTitle").innerText =
+    test.name;
+
+
+    document.getElementById("dCode").innerText =
+    test.code;
+
+    document.getElementById("dName").innerText =
+    test.name;
+
+    document.getElementById("dSample").innerText =
+    test.sample;
+
+    document.getElementById("dQuantity").innerText =
+    test.quantity;
+
+    document.getElementById("dMethod").innerText =
+    test.method;
+
+    document.getElementById("dTat").innerText =
+    test.tat;
+
+    document.getElementById("dSchedule").innerText =
+    test.schedule;
+
+    document.getElementById("dPrice").innerText =
+    test.price;
+
+    document.getElementById("dFasting").innerText =
+    test.fasting;
+
+    document.getElementById("dDepartment").innerText =
+    test.department;
+
+    document.getElementById("dCategory").innerText =
+    test.category;
+
+    document.getElementById("dContainer").innerText =
+    test.container;
+
+    document.getElementById("dClinical").innerText =
+    test.clinicalSignificance;
+
+    document.getElementById("dPreparation").innerText =
+    test.patientPreparation;
+
+    document.getElementById("dParameters").innerText =
+    test.parameters;
+
+
+    document
+    .getElementById("testModal")
+    .classList
+    .add("show");
+
+
+    document.body.style.overflow="hidden";
+
+}
+
+
+/* CLOSE POPUP */
+
+function closeModal(){
+
+    document
+    .getElementById("testModal")
+    .classList
+    .remove("show");
+
+    document.body.style.overflow="";
+
+}
+
+
+/* CLOSE WHEN CLICK OUTSIDE */
+
+document
+.getElementById("testModal")
+.addEventListener("click",function(e){
+
+    if(e.target === this){
+
+        closeModal();
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
