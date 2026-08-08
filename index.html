@@ -279,7 +279,7 @@ async function loadTestsFromSupabase(){
   for(let offset=0;;offset+=pageSize){
     const url=`${SUPABASE_URL}/rest/v1/tests?select=*&order=test_code.asc&offset=${offset}&limit=${pageSize}`;
     const res=await fetch(url,{
-      headers:{apikey:sb_publishable_t_TwmdClRwjDD1ThzZvgLw_GrflLBvA,Authorization:`Bearer ${sb_publishable_t_TwmdClRwjDD1ThzZvgLw_GrflLBvA}`}
+      headers:{apikey:SUPABASE_PUBLISHABLE_KEY,Authorization:`Bearer ${SUPABASE_PUBLISHABLE_KEY}`}
     });
     if(!res.ok) throw new Error(`Supabase error ${res.status}: ${await res.text()}`);
     const rows=await res.json(); all.push(...rows);
