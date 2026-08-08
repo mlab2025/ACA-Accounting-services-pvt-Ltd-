@@ -131,8 +131,12 @@ tr:nth-child(even) td{background:#effaf5}
  </div>
 </div>
 
+
 <script>
-let tests=[],shown=[];
+const SUPABASE_URL = 'https://lecasfvrrydhmlmcihex.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE';
+
+let tests=[], shown=[];
 
 const V = v => (v===undefined || v===null || String(v).trim()==='' ? 'No Record Found' : String(v));
 const esc = s => V(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -141,6 +145,44 @@ const pretty = k => k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase())
 
 function grid(id,obj){
   document.getElementById(id).innerHTML = Object.entries(obj||{}).map(([k,v])=>R(pretty(k),v)).join('');
+}
+
+function normalize(row){
+  return {
+    code: row.test_code, name: row.test_name,
+    sampleType: row.sample_type, sampleQuantity: row.sample_quantity,
+    method: row.method, price: row.price, category: row.category, department: row.department,
+    overview: {
+      "Test Code": row.test_code, "Test Name": row.test_name, "Test Type": row.test_type,
+      Department: row.department, Method: row.method, Gender: row.gender,
+      "Test Parameters (Name)": row.test_parameters_name,
+      "Test Parameters (Count)": row.test_parameters_count,
+      "Report Display Name": row.report_display_name
+    },
+    sampleGuidelines: {
+      "Sample Container": row.sample_container, "Sample Type": row.sample_type,
+      "Sample Quantity": row.sample_quantity, "Sample Volume": row.sample_volume,
+      "Shipping Temperature & Sample Stability": row.shipping_temperature_stability,
+      Ambient: row.ambient, Refrigerated: row.refrigerated, Frozen: row.frozen,
+      "Rejected, if any": row.rejected_if_any, "Sample Retention": row.sample_retention,
+      "Collection Instruction": row.collection_instruction
+    },
+    testSchedule: {
+      "Test Schedule": row.test_schedule, TAT: row.tat, "Days Reported On": row.days_reported_on
+    },
+    testFeesCategory: {
+      Price: row.price, Category: row.category, "Fee Price": row.fee_price, "Fee Category": row.fee_category
+    },
+    clinicalInformationResources: {
+      "Clinical Significance": row.clinical_significance, "Patient Preparation": row.patient_preparation,
+      Interpretation: row.interpretation, "Special Instructions": row.special_instructions,
+      "Referral / Outsource Information": row.referral_outsource_information, Description: row.description
+    },
+    reports: {
+      "Report Information": row.report_information, "Report Format": row.report_format,
+      "Download PDF": row.download_pdf
+    }
+  };
 }
 
 function render(list){
@@ -164,53 +206,44 @@ function render(list){
 function doSearch(){
   const q=document.getElementById('q').value.toLowerCase().trim();
   render(!q ? tests : tests.filter(t=>[
-    t.code,t.name,t.sampleType,t.sampleQuantity,t.method,t.department,t.category
+    t.code,t.name,t.sampleType,t.sampleQuantity,t.method,t.department,t.category,
+    JSON.stringify(t.overview),JSON.stringify(t.sampleGuidelines),
+    JSON.stringify(t.testSchedule),JSON.stringify(t.testFeesCategory),
+    JSON.stringify(t.clinicalInformationResources)
   ].some(x=>String(x||'').toLowerCase().includes(q))));
 }
 document.getElementById('q').addEventListener('input',doSearch);
 
 function fillDetails(t){
   document.getElementById('title').textContent=V(t.name);
-  grid('overviewGrid',t.overview);
-  grid('sampleGrid',t.sampleGuidelines);
-  grid('scheduleGrid',t.testSchedule);
-  grid('feesGrid',t.testFeesCategory);
-  grid('clinicalGrid',t.clinicalInformationResources);
-  grid('reportsGrid',t.reports);
+  grid('overviewGrid',t.overview); grid('sampleGrid',t.sampleGuidelines);
+  grid('scheduleGrid',t.testSchedule); grid('feesGrid',t.testFeesCategory);
+  grid('clinicalGrid',t.clinicalInformationResources); grid('reportsGrid',t.reports);
 }
 
 function openDetails(i,start='overview'){
   const t=shown[i]; if(!t)return;
-  fillDetails(t);
+  fillDetails(t); restoreFull();
   document.getElementById('modal').classList.add('show');
   document.body.style.overflow='hidden';
-  const content=document.getElementById('detailContent');
-  content.scrollTop=0;
+  document.getElementById('detailContent').scrollTop=0;
   setTimeout(()=>jumpTo(start),50);
 }
 
-/* Schedule/TAT eye = ONLY schedule & TAT, no other tabs/sections. */
 function openSchedule(i){
   const t=shown[i]; if(!t)return;
+  fillDetails(t);
   document.getElementById('title').textContent=V(t.name)+' — Schedule & TAT';
-  grid('scheduleGrid',t.testSchedule);
   document.getElementById('modal').classList.add('show');
   document.body.style.overflow='hidden';
-
-  // Hide every section except schedule for this special eye button.
-  ['overview','sample','fees','clinical','reports'].forEach(id=>{
-    document.getElementById(id).style.display='none';
-  });
+  ['overview','sample','fees','clinical','reports'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('schedule').style.display='block';
   document.querySelectorAll('.tab').forEach(x=>x.style.display='none');
   document.getElementById('detailContent').scrollTop=0;
 }
 
-/* Restore full-detail view. */
 function restoreFull(){
-  ['overview','sample','schedule','fees','clinical','reports'].forEach(id=>{
-    document.getElementById(id).style.display='block';
-  });
+  ['overview','sample','schedule','fees','clinical','reports'].forEach(id=>document.getElementById(id).style.display='block');
   document.querySelectorAll('.tab').forEach(x=>x.style.display='block');
 }
 
@@ -225,8 +258,7 @@ function jumpTo(id,btn){
 
 function closeModal(){
   document.getElementById('modal').classList.remove('show');
-  document.body.style.overflow='';
-  restoreFull();
+  document.body.style.overflow=''; restoreFull();
 }
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
 
@@ -234,18 +266,34 @@ document.getElementById('detailContent').addEventListener('scroll',()=>{
   const sections=['overview','sample','schedule','fees','clinical','reports'];
   let current='overview', best=-1;
   sections.forEach(id=>{
-    const el=document.getElementById(id);
-    if(el.style.display==='none')return;
+    const el=document.getElementById(id); if(el.style.display==='none')return;
     const d=Math.abs(el.getBoundingClientRect().top-document.getElementById('detailContent').getBoundingClientRect().top-20);
     if(best===-1||d<best){best=d;current=id;}
   });
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.page===current));
 });
 
-fetch('tests.json')
-.then(r=>{if(!r.ok)throw Error('tests.json not found');return r.json()})
-.then(d=>{tests=Array.isArray(d)?d:[];render(tests)})
-.catch(()=>{document.getElementById('tbody').innerHTML='<tr><td colspan="10" class="no">tests.json load nahi ho rahi. index.html aur tests.json same folder me rakhein.</td></tr>';document.getElementById('count').textContent='Data load error';});
+async function loadTestsFromSupabase(){
+  if(SUPABASE_PUBLISHABLE_KEY.includes('PASTE_YOUR_')) throw new Error('Publishable key not added');
+  const all=[], pageSize=1000;
+  for(let offset=0;;offset+=pageSize){
+    const url=`${SUPABASE_URL}/rest/v1/tests?select=*&order=test_code.asc&offset=${offset}&limit=${pageSize}`;
+    const res=await fetch(url,{
+      headers:{apikey:sb_publishable_t_TwmdClRwjDD1ThzZvgLw_GrflLBvA,Authorization:`Bearer ${sb_publishable_t_TwmdClRwjDD1ThzZvgLw_GrflLBvA}`}
+    });
+    if(!res.ok) throw new Error(`Supabase error ${res.status}: ${await res.text()}`);
+    const rows=await res.json(); all.push(...rows);
+    if(rows.length<pageSize) break;
+  }
+  return all.map(normalize);
+}
+
+loadTestsFromSupabase().then(d=>{tests=d;render(tests)}).catch(err=>{
+  console.error(err);
+  document.getElementById('tbody').innerHTML='<tr><td colspan="10" class="no">Database load error. Check Supabase URL, Publishable Key and RLS policy.</td></tr>';
+  document.getElementById('count').textContent='Data load error';
+});
 </script>
+
 </body>
 </html>
