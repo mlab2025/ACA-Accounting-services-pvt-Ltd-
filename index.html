@@ -74,7 +74,7 @@ tr:nth-child(even) td{background:#effaf5}
         <th>Sample Type</th>
         <th>Sample Quantity</th>
         <th>Method</th>
-        <th>View Schedule & TAT</th>
+        <th>View Test Schedule</th>
         <th>Price</th>
         <th>Category</th>
         <th>Department</th>
@@ -161,22 +161,20 @@ function normalize(row){
     },
     sampleGuidelines: {
       "Sample Container": row.sample_container, "Sample Type": row.sample_type,
-      "Sample Quantity": row.sample_quantity, "Sample Volume": row.sample_volume,
+      "Sample Quantity": row.sample_quantity,
       "Shipping Temperature & Sample Stability": row.shipping_temperature_stability,
-      Ambient: row.ambient, Refrigerated: row.refrigerated, Frozen: row.frozen,
       "Rejected, if any": row.rejected_if_any, "Sample Retention": row.sample_retention,
       "Collection Instruction": row.collection_instruction
     },
     testSchedule: {
-      "Test Schedule": row.test_schedule, TAT: row.tat, "Days Reported On": row.days_reported_on
+      "Test Schedule": row.test_schedule, "Days Reported On": row.days_reported_on
     },
     testFeesCategory: {
-      Price: row.price, Category: row.category, "Fee Price": row.fee_price, "Fee Category": row.fee_category
+      "Patient MRP": row.price, Category: row.category
     },
     clinicalInformationResources: {
       "Clinical Significance": row.clinical_significance, "Patient Preparation": row.patient_preparation,
-      Interpretation: row.interpretation, "Special Instructions": row.special_instructions,
-      "Referral / Outsource Information": row.referral_outsource_information, Description: row.description
+      Interpretation: row.interpretation, "Special Instructions": row.special_instructions
     },
     reports: {
       "Report Information": row.report_information, "Report Format": row.report_format,
@@ -233,7 +231,7 @@ function openDetails(i,start='overview'){
 function openSchedule(i){
   const t=shown[i]; if(!t)return;
   fillDetails(t);
-  document.getElementById('title').textContent=V(t.name)+' — Schedule & TAT';
+  document.getElementById('title').textContent=V(t.name)+' — Test Schedule';
   document.getElementById('modal').classList.add('show');
   document.body.style.overflow='hidden';
   ['overview','sample','fees','clinical','reports'].forEach(id=>document.getElementById(id).style.display='none');
